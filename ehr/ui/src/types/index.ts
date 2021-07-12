@@ -65,12 +65,12 @@ export type Occurrence = {
 	end: string
 }
 
-export type Goal = {
+export type ServiceRequestGoal = {
 	display: string,
 	id: string
 }
 
-export type Consent = {
+export type ServiceRequestConsent = {
 	display: string,
 	id: string
 }
@@ -80,7 +80,7 @@ export type Coding = {
 	display: string
 }
 
-export type Condition = {
+export type ServiceRequestCondition = {
 	display: string,
 	id: string
 };
@@ -90,13 +90,18 @@ export type Procedure = {
 	id: string
 }
 
+export type Period = {
+	start: string,
+	end?: string
+}
+
 export type ServiceRequest = {
 	category: Coding,
 	code: Coding,
-	conditions: Condition[],
-	consent: Consent,
+	conditions: ServiceRequestCondition[],
+	consent: ServiceRequestConsent,
 	errors: string[],
-	goals: Goal[],
+	goals: ServiceRequestGoal[],
 	id: string,
 	occurrence: Occurrence
 };
@@ -111,6 +116,29 @@ export type newTaskPayload = {
 	code: string,
 	name: string,
 	occurrence: Occurrence | string
+};
+
+export type NewConcernPayload = {
+	name: string,
+	category: string
+	icdCode: string,
+	snomedCode: string
+}
+
+export type Concern = {
+	id: string,
+	name: string,
+	category: Coding,
+	icdCode: Coding,
+	snomedCode: Coding,
+	basedOn: string | {
+		display: string,
+		id: string,
+	},
+	assessmentDate?: string,
+	startDate?: string,
+	resolutionDate?: string,
+	errors: string[]
 };
 
 export type updateTaskPayload = {
@@ -129,4 +157,99 @@ export type Comment = {
 	},
 	text: string,
 	time: string
+};
+
+export type Assessment = {
+	id: string,
+	name: string,
+	questionnaireUrl: string,
+	date: string,
+	healthConcerns: {
+		id: string,
+		display: string
+	}[],
+	previous?: Assessment[],
+	assessmentResponse: {
+		question: string,
+		answer: string
+	}[]
+};
+
+export type Problem = {
+	id: string,
+	name: string,
+	authoredBy?: {},
+	basedOn: string | {
+		display: string,
+		id: string,
+	},
+	category: Coding,
+	assessmentDate?: string,
+	startDate?: string,
+	resolutionDate?: string,
+	errors: string[],
+	icdCode: Coding,
+	snomedCode: Coding
+};
+
+export type newProblemPayload = {
+	name: string,
+	category: string,
+	codeICD: string,
+	codeSNOMED: string
+}
+
+export type updateProblemPayload = {
+	id: string,
+	closeDate: string,
+	status: string
+}
+
+export type Goal = {
+	id: string,
+	name: string,
+	problems: string[],
+	addedBy: string,
+	startDate: string,
+	endDate: string,
+	targets: string[],
+	comments: Comment[],
+	category: Coding,
+	code: Coding,
+	status: GoalStatus
+};
+
+export type NewGoalPayload = {
+	name: string,
+	category: string,
+	code: string,
+	problems?: string[],
+	addedBy?: string,
+	startDate?: string,
+	comments?: string,
+}
+
+export type GoalStatus = "active" | "completed"
+
+export type UpdateGoalPayload = {
+	id: string,
+	category?: string,
+	code?: string,
+	name?: string,
+	problems?: string[],
+	startDate?: string,
+	addedBy?: string
+	comment?: string,
+	status?: "active" | "completed",
+	endDate?: string
+};
+
+export type Consent = {
+	id: string,
+	name: string,
+	status: string,
+	scope: string,
+	category: string,
+	organization: string,
+	consentDate: string
 };

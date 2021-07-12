@@ -2,6 +2,7 @@ package org.hl7.gravity.refimpl.sdohexchange.util;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.parser.IParser;
 import com.google.common.base.Strings;
 import lombok.experimental.UtilityClass;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -101,6 +102,19 @@ public class FhirUtil {
   }
 
   /**
+   * Get first resource of specific type from a resource bundle. Resources are retrieved from Bundle.getResource().
+   */
+  public <T extends IBaseResource> T getFirstFromBundle(Bundle bundle, Class<T> resourceType) {
+    return bundle.getEntry()
+        .stream()
+        .map(Bundle.BundleEntryComponent::getResource)
+        .filter(resourceType::isInstance)
+        .map(resourceType::cast)
+        .findFirst()
+        .orElse(null);
+  }
+
+  /**
    * Get resource id for a resource of specific type from a resource bundle. Resources are retrieved from
    * Bundle.getResponse(). If multiple resources of the same type are present - a first one will be fetched.
    */
@@ -149,6 +163,18 @@ public class FhirUtil {
   }
 
   /**
+   * Create a {@link org.hl7.fhir.r4.model.Bundle.BundleEntryComponent} GET entry for a search as part of a transaction
+   * Bundle.
+   */
+  public Bundle.BundleEntryComponent createGetEntry(String url) {
+    Bundle.BundleEntryComponent bundleEntryComponent = new Bundle.BundleEntryComponent();
+    bundleEntryComponent.getRequest()
+        .setMethod(Bundle.HTTPVerb.GET)
+        .setUrl(url);
+    return bundleEntryComponent;
+  }
+
+  /**
    * Extract all references from all fields for a specified instance. Pass a FHIRContext not to create a new one every
    * time for performance considerations.
    */
@@ -188,5 +214,29 @@ public class FhirUtil {
             .equals(reference.getReferenceElement()
                 .getResourceType()))
         .collect(Collectors.toList());
+  }
+
+  /**
+   * This method is useful when an original response bundle should be populated with additional includes, which are not
+   * supported by a search query.
+   *
+   * @param fhirContext FHIR Context.
+   * @param original    Original response bundle. All includes will be added to it.
+   * @param includes    All the includes to be added.
+   * @return Merged search set. Count of results is the same as in the original bundle.
+   */
+  public Bundle mergeBundles(FhirContext fhirContext, Bundle original, Bundle includes) {
+    if (original.getType() != Bundle.BundleType.SEARCHSET) {
+      throw new IllegalArgumentException("Original bundle is not a search set.");
+    }
+    if (includes.getType() != Bundle.BundleType.SEARCHSET) {
+      throw new IllegalArgumentException("Includes bundle is not a search set.");
+    }
+    original.getEntry()
+        .addAll(includes.getEntry());
+
+    IParser iParser = fhirContext.newJsonParser();
+    //Re-parse bundle to resolve all references as included resources (Reference.getResource())
+    return iParser.parseResource(Bundle.class, iParser.encodeResourceToString(original));
   }
 }
