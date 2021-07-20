@@ -18,7 +18,7 @@ export default defineComponent({
 		Consents
 	},
 	setup() {
-		const activeTab = ref<string>("actionSteps");
+		const activeTab = ref<string>("healthConcerns");
 		const addGoalPhase = ref<boolean>(false);
 		const newGoalProblems = ref<string[]>([]);
 		const assessmentToOpenId = ref<string>("");
@@ -41,12 +41,30 @@ export default defineComponent({
 			newGoalProblems.value = [];
 		};
 
+		const addActionPhase = ref<boolean>(false);
+		const newActionProblems = ref<string[]>([]);
+
+		const handleAddActionFromProblem = (problemId: string) => {
+			activeTab.value = "actionSteps";
+			addActionPhase.value = true;
+			newActionProblems.value = [problemId];
+		};
+
+		const resetAddActionPhase =  () => {
+			addActionPhase.value = false;
+			newActionProblems.value = [];
+		};
+
 		return {
 			activeTab,
 			addGoalPhase,
 			newGoalProblems,
 			handleAddGoalFromProblem,
 			resetAddGoalPhase,
+			addActionPhase,
+			newActionProblems,
+			handleAddActionFromProblem,
+			resetAddActionPhase,
 			openAssessment,
 			assessmentToOpenId,
 			openAssessmentPhase
@@ -60,6 +78,7 @@ export default defineComponent({
 		<el-tab-pane
 			label="Health Concerns"
 			name="healthConcerns"
+			:lazy="true"
 		>
 			<HealthConcerns
 				@trigger-open-assessment="openAssessment"
@@ -68,15 +87,18 @@ export default defineComponent({
 		<el-tab-pane
 			label="Problems"
 			name="problems"
+			:lazy="true"
 		>
 			<Problems
 				@trigger-add-goal="handleAddGoalFromProblem"
 				@trigger-open-assessment="openAssessment"
+				@trigger-add-action-step="handleAddActionFromProblem"
 			/>
 		</el-tab-pane>
 		<el-tab-pane
 			label="Goals"
 			name="goals"
+			:lazy="true"
 		>
 			<Goals
 				:add-goal-phase="addGoalPhase"
@@ -88,12 +110,19 @@ export default defineComponent({
 		<el-tab-pane
 			label="Action Steps"
 			name="actionSteps"
+			:lazy="true"
 		>
-			<ActionSteps />
+			<ActionSteps
+				:add-action-phase="addActionPhase"
+				:new-action-problems="newActionProblems"
+				:is-active="activeTab === 'actionSteps'"
+				@stop-add-action="resetAddActionPhase"
+			/>
 		</el-tab-pane>
 		<el-tab-pane
 			label="Social Risk Assessments"
 			name="socialRiskAssessments"
+			:lazy="true"
 		>
 			<RiskAssessments
 				:open-assessment-phase="openAssessmentPhase"
@@ -105,6 +134,7 @@ export default defineComponent({
 		<el-tab-pane
 			label="Consents"
 			name="consents"
+			:lazy="true"
 		>
 			<Consents />
 		</el-tab-pane>
@@ -141,6 +171,10 @@ export default defineComponent({
 
 	::v-deep(.el-tab-pane) {
 		padding: 20px;
+
+		> div {
+			min-height: 130px;
+		}
 	}
 
 	::v-deep(.el-tabs__item) {
