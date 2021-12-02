@@ -34,6 +34,10 @@ export type Occurrence = {
 export type Task = {
 	id: string,
 	name: string,
+	baseTask?: {
+		id: string,
+		display: string
+	},
 	createdAt: string,
 	lastModified: string,
 	priority: string,
@@ -59,6 +63,10 @@ export type Task = {
 		resourceType: string,
 		id: string,
 		display: string
+	},
+	performer?: {
+		display: string,
+		id: string
 	},
 	consent: string,
 	comments: Comment[],
@@ -89,7 +97,14 @@ export type UpdateTaskPayload = {
 	outcome?: string,
 	statusReason?: string,
 	procedureCodes?: string[],
-	status: UpdatedStatus
+	status: UpdatedStatus,
+	cboPerformer?: string,
+	priorityForCBO?: string
+}
+
+export type UpdateOurTaskPayload = {
+	status: "Cancelled",
+	statusReason: string
 }
 
 
@@ -108,4 +123,11 @@ export type Resources = {
 	conditions: string[],
 	goals: string[],
 	procedures: string[]
+}
+
+export type Cbo = {
+	id: string,
+	name: string,
+	type: string,
+	errors: string[]
 }
