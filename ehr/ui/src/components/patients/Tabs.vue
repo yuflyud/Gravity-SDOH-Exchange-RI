@@ -6,6 +6,7 @@ import RiskAssessments from "@/components/patients/risk-assessments/RiskAssessme
 import Problems from "@/components/patients/problems/Problems.vue";
 import Goals from "@/components/patients/goals/Goals.vue";
 import Consents from "@/components/patients/consents/Consents.vue";
+import PatientTasks from "@/components/patients/patient-tasks/PatientTasks.vue";
 
 export default defineComponent({
 	name: "Tabs",
@@ -15,7 +16,8 @@ export default defineComponent({
 		ActionSteps,
 		RiskAssessments,
 		Goals,
-		Consents
+		Consents,
+		PatientTasks
 	},
 	setup() {
 		const activeTab = ref<string>("healthConcerns");
@@ -119,6 +121,15 @@ export default defineComponent({
 				:new-action-problems="newActionProblems"
 				:is-active="activeTab === 'actionSteps'"
 				@stop-add-action="resetAddActionPhase"
+			/>
+		</el-tab-pane>
+		<el-tab-pane
+			label="Patient Tasks"
+			name="patientTasks"
+			:lazy="true"
+		>
+			<PatientTasks
+				@trigger-open-assessment="openAssessment"
 			/>
 		</el-tab-pane>
 		<el-tab-pane

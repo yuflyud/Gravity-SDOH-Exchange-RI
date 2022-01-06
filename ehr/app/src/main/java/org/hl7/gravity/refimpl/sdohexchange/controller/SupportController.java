@@ -7,7 +7,9 @@ import org.hl7.gravity.refimpl.sdohexchange.config.SpringFoxConfig;
 import org.hl7.gravity.refimpl.sdohexchange.dto.response.ActiveResourcesDto;
 import org.hl7.gravity.refimpl.sdohexchange.dto.response.ConditionDto;
 import org.hl7.gravity.refimpl.sdohexchange.dto.response.GoalInfoDto;
+import org.hl7.gravity.refimpl.sdohexchange.dto.response.HealthcareServiceDto;
 import org.hl7.gravity.refimpl.sdohexchange.dto.response.OrganizationDto;
+import org.hl7.gravity.refimpl.sdohexchange.dto.response.ReferenceDto;
 import org.hl7.gravity.refimpl.sdohexchange.service.SupportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -53,6 +55,19 @@ public class SupportController {
           + "Consider looking at 'errors' response field which holds additional conformance and validation checks.")
   public List<OrganizationDto> listOrganizations() {
     return supportService.listOrganizations();
+  }
+
+  @GetMapping("healthcare-services")
+  @ApiOperation(value = "List all HealthcareService resources for specific Organization.",
+      notes = "Consider looking at 'errors' response field which holds additional conformance and validation checks.")
+  public List<HealthcareServiceDto> listHealthcareServices(String organizationId) {
+    return supportService.listHealthcareServices(organizationId);
+  }
+
+  @GetMapping("assessments")
+  @ApiOperation(value = "List all Questionnaire resources.")
+  public List<ReferenceDto> listAssessments() {
+    return supportService.listAssessments();
   }
 
   @GetMapping("activeResources")
