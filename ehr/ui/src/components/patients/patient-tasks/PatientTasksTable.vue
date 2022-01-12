@@ -146,13 +146,29 @@ export default defineComponent({
 
 			<el-table-column label="Referral">
 				<template #default="scope">
-					{{ scope.row.referralTask?.display || "N/A" }}
-					<span
-						v-if="scope.row.referralTask && scope.row.referralTask?.display"
-						class="icon-link"
-						@click="$emit('trigger-open-action-step', scope.row.referralTask.id)"
+					<el-popover
+						:disabled="!scope.row.referralTask"
+						effect="light"
+						trigger="hover"
+						placement="bottom"
 					>
-					</span>
+						<template #default>
+							{{ scope.row.referralTask?.display || "N/A" }}
+						</template>
+						<template #reference>
+							<div class="cell-wrapper">
+								<div class="cell-text">
+									{{ scope.row.referralTask?.display || "N/A" }}
+								</div>
+								<span
+									v-if="scope.row.referralTask && scope.row.referralTask?.display"
+									class="icon-link"
+									@click="$emit('trigger-open-action-step', scope.row.referralTask.id)"
+								>
+								</span>
+							</div>
+						</template>
+					</el-popover>
 				</template>
 			</el-table-column>
 
@@ -196,8 +212,16 @@ export default defineComponent({
 							{{ scope.row.statusReason || scope.row.outcomes || scope.row.assessmentResponse?.display || "N/A" }}
 						</template>
 						<template #reference>
-							<div class="cell-text">
-								{{ scope.row.statusReason || scope.row.outcomes || scope.row.assessmentResponse?.display || "N/A" }}
+							<div class="cell-wrapper">
+								<div class="cell-text">
+									{{ scope.row.statusReason || scope.row.outcomes || scope.row.assessmentResponse?.display || "N/A" }}
+								</div>
+								<span
+									v-if="scope.row.assessmentResponse && scope.row.assessmentResponse?.display"
+									class="icon-link"
+									@click="$emit('trigger-open-assessment', scope.row.assessmentResponse.id)"
+								>
+								</span>
 							</div>
 						</template>
 					</el-popover>
